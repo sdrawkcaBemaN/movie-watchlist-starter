@@ -5,6 +5,7 @@ from flask_jwt_extended import JWTManager
 from db import db
 from dotenv import load_dotenv
 
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -20,6 +21,17 @@ CORS(app)
 with app.app_context():
     import models 
     db.create_all()
+
+def initialize_routes():
+    from routes.auth import auth_bp
+    from routes.movie import movie_bp
+    from routes.watchlist import watchlist_bp
+
+    app.register_blueprint(auth_bp, url_prefix='/api/auth')
+    app.register_blueprint(movie_bp, url_prefix='/api/movies')
+    app.register_blueprint(watchlist_bp, url_prefix='/api/watchlist')
+    
+initialize_routes()
 
 @app.route('/')
 def home():
