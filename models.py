@@ -1,7 +1,7 @@
 from db import db
-from sqlalchemy import String, Integer, ForeignKey, Text
+from sqlalchemy import String, Integer, ForeignKey, Text, DateTime, UniqueConstraint
 from sqlalchemy.orm import mapped_column
-from sqlalchemy import DateTime
+from sqlalchemy import JSON
 from datetime import datetime, timezone
 
 class User(db.Model):
@@ -19,7 +19,6 @@ class User(db.Model):
         onupdate=lambda: datetime.now(timezone.utc)
     )
 
-    # Relationships
     watchlists = db.relationship('Watchlist', back_populates='user', cascade="all, delete-orphan")
     reviews = db.relationship('Review', back_populates='user', cascade="all, delete-orphan")
 
@@ -37,11 +36,16 @@ class Movie(db.Model):
     
     id = mapped_column(Integer, primary_key=True, autoincrement=True)
     title = mapped_column(String(255), nullable=False)
-    description = mapped_column(Text, nullable=True)
-    genre = mapped_column(String(255), nullable=True)
-    release_year = mapped_column(Integer, nullable=True)
+    year = mapped_column(Integer, nullable=False)
+    director = mapped_column(String(255), nullable=False)
+    genres = mapped_column(JSON, nullable=False)
+    rating = mapped_column(db.Float, nullable=True)
+    duration = mapped_column(String(50), nullable=True)
+    synopsis = mapped_column(Text, nullable=True)
+    poster_url = mapped_column(String(500), nullable=True)
+    cast = mapped_column(JSON, nullable=True)
 
-    # Relationships
+    
     watchlists = db.relationship('Watchlist', back_populates='movie', cascade="all, delete-orphan")
     reviews = db.relationship('Review', back_populates='movie', cascade="all, delete-orphan")
 
@@ -49,14 +53,21 @@ class Movie(db.Model):
         return {
             "id": self.id,
             "title": self.title,
-            "description": self.description,
-            "genre": self.genre,
-            "release_year": self.release_year
+            "year": self.year,
+            "director": self.director,
+            "genres": self.genres or [],
+            "rating": self.rating,
+            "duration": self.duration,
+            "synopsis": self.synopsis,
+            "poster_url": self.poster_url,
+            "cast": self.cast or []
         }
 
 
 class Watchlist(db.Model):
     __tablename__ = "watchlist"
+
+    __table_args__ = ( UniqueConstraint("user_id", "movie_id", name="unique_user_watchlist_movie"),)
     
     id = mapped_column(Integer, primary_key=True, autoincrement=True)
     user_id = mapped_column(Integer, ForeignKey('users.id'), nullable=False)
@@ -80,6 +91,10 @@ class Watchlist(db.Model):
 
 class Review(db.Model):
     __tablename__ = "reviews"
+
+    __table_args__ = (
+        UniqueConstraint("user_id", "movie_id", name="unique_user_movie_review"),
+    )
     
     id = mapped_column(Integer, primary_key=True, autoincrement=True)
     user_id = mapped_column(Integer, ForeignKey('users.id'), nullable=False)
@@ -94,7 +109,6 @@ class Review(db.Model):
         onupdate=lambda: datetime.now(timezone.utc)
     )
 
-    # Relationships
     user = db.relationship('User', back_populates='reviews')
     movie = db.relationship('Movie', back_populates='reviews')
 
@@ -106,5 +120,6 @@ class Review(db.Model):
             "rating": self.rating,
             "review": self.review,
             "movie": self.movie.to_json() if self.movie else None,
-            "created_at": self.created_at.isoformat() if self.created_at else None
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None
         }
