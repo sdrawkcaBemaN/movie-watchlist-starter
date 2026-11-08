@@ -24,6 +24,7 @@ API Testing: You can use Postman to access the API endpoints documented below.
 
 ## Project Structure
 
+```text
 movie-watchlist-starter/
 ├── app.py # Main Flask application
 ├── db.py # SQLAlchemy database configuration
@@ -48,6 +49,7 @@ movie-watchlist-starter/
 ├── index.html
 ├── app.js
 └── README.md
+```
 
 ## Prerequisites
 
