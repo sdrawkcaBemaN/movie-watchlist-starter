@@ -11,7 +11,6 @@ class User(db.Model):
     username = mapped_column(String(255), unique=True, nullable=False)
     email = mapped_column(String(255), unique=True, nullable=False)
     password_hash = mapped_column(String(255), nullable=False)
-    
     created_at = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = mapped_column(
         DateTime, 
@@ -21,6 +20,8 @@ class User(db.Model):
 
     watchlists = db.relationship('Watchlist', back_populates='user', cascade="all, delete-orphan")
     reviews = db.relationship('Review', back_populates='user', cascade="all, delete-orphan")
+    watched = db.relationship('Watched', back_populates='user', cascade="all, delete-orphan")
+
 
     def to_json(self):
         return {
@@ -48,6 +49,7 @@ class Movie(db.Model):
     
     watchlists = db.relationship('Watchlist', back_populates='movie', cascade="all, delete-orphan")
     reviews = db.relationship('Review', back_populates='movie', cascade="all, delete-orphan")
+    watched = db.relationship('Watched', back_populates='user', cascade="all, delete-orphan")
 
     def to_json(self):
         return {
@@ -72,7 +74,6 @@ class Watchlist(db.Model):
     id = mapped_column(Integer, primary_key=True, autoincrement=True)
     user_id = mapped_column(Integer, ForeignKey('users.id'), nullable=False)
     movie_id = mapped_column(Integer, ForeignKey('movies.id'), nullable=False)
-    
     created_at = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
@@ -88,6 +89,30 @@ class Watchlist(db.Model):
             "created_at": self.created_at.isoformat() if self.created_at else None
         }
 
+class Watched(db.Model):
+    __tablename__ = "watched"
+
+    __table_args__ = (
+        UniqueConstraint("user_id", "movie_id", name="unique_user_watched_movie"),
+    )
+
+    id = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id = mapped_column(Integer, ForeignKey('users.id'), nullable=False)
+    movie_id = mapped_column(Integer, ForeignKey('movies.id'), nullable=False)
+    watched_at = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    user = db.relationship('User', back_populates='watched')
+    movie = db.relationship('Movie', back_populates='watched')
+
+    def to_json(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "movie_id": self.movie_id,
+            "movie": self.movie.to_json() if self.movie else None,
+            "watched_at": self.watched_at.isoformat() if self.watched_at else None
+        }
+
 
 class Review(db.Model):
     __tablename__ = "reviews"
@@ -101,7 +126,6 @@ class Review(db.Model):
     movie_id = mapped_column(Integer, ForeignKey('movies.id'), nullable=False)
     rating = mapped_column(Integer, nullable=False)      
     review = mapped_column(Text, nullable=True)         
-    
     created_at = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = mapped_column(
         DateTime, 
