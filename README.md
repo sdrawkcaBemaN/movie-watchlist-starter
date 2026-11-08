@@ -6,9 +6,9 @@ FilmLog is a movie watchlist and review platform that lets users find movies and
 
 ## Live Demo
 
-Website: https://movie-watchlist-starter-frontend-mcl4p1b3g-gooners25.vercel.app/
-Backend API: https://filmlog-five.vercel.app/
-API Testing: You can use Postman to access the API endpoints documented below.
+- Website: https://movie-watchlist-starter-frontend-mcl4p1b3g-gooners25.vercel.app/
+- Backend API: https://filmlog-five.vercel.app/
+- API Testing: You can use Postman to access the API endpoints documented below.
 
 ## Tech Stack
 
