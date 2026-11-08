@@ -1,85 +1,100 @@
-# FilmLog — GDGoC Backend Recruitment Task Starter Pack
+# FilmLog
 
-Selamat datang di repositori penugasan backend **FilmLog (Movie Watchlist & Review Platform)**. Repositori ini menyediakan:
-1. **Initial Seed Database** (`data/movies.json` dan `data/seed.sql`) berisi 20 film kurasi awal dengan atribut lengkap.
-2. **Frontend Companion** (`frontend/`) bertema Letterboxd yang siap pakai untuk menguji endpoint backend Anda secara visual dan interaktif.
+## Overview
 
----
+FilmLog is a movie watchlist and review platform that lets users find movies and manage their watchlists, watched movies, and also write their own reviews. This application also uses Google Gemini AI to give personal reccomendations based on a user prompt.
 
-## 🎯 Objektif Penugasan
-Rancang dan bangun layanan **RESTful API** untuk aplikasi pelacak film (*movie watchlist*) yang mendukung alur autentikasi, kurasi film, pencatatan tontonan dan ulasan, serta integrasi **Google Gemini LLM** untuk rekomendasi film berbasis data lokal.
+## Live Demo
 
-Bebas menggunakan bahasa pemrograman dan framework apa pun (Node.js/Express/NestJS, Go/Gin/Fiber, Python/FastAPI/Django, PHP/Laravel, Java/Spring Boot, dll.) serta database relasional (PostgreSQL, MySQL, SQLite) atau NoSQL.
+Website: https://movie-watchlist-starter-frontend-mcl4p1b3g-gooners25.vercel.app/
+Backend API: https://filmlog-five.vercel.app/
+API Testing: You can use Postman to access the API endpoints documented below.
 
----
+## Tech Stack
 
-## 📁 Struktur Repositori Starter
+### Backend
 
-```text
+- **Python** - Main programming language
+- **Flask** - REST API framework
+- **Flask SQL Alchemy** - ORM for flask
+- **SQLite** - Relational database
+- **JWT** - Authentication and protecting routes
+- **Bcrypt** - Password hashing
+- **Gemini API** - AI movie reccomendations
+
+## Project Structure
+
 movie-watchlist-starter/
+├── app.py # Main Flask application
+├── db.py # SQLAlchemy database configuration
+├── models.py # Database models and relationships
+├── requirements.txt # Dependencies and requirements
+├── .env # Environment variables (not committed)
+├── .gitignore # Ignored files
+├── README.md
+│
 ├── data/
-│   ├── movies.json     # Data 20 film awal (format JSON) untuk database seeder
-│   └── seed.sql        # Skrip SQL INSERT kompatibel dengan PostgreSQL & MySQL
-├── frontend/
-│   ├── index.html      # Frontend Letterboxd-style SPA (Zero-build Tailwind)
-│   ├── app.js          # Client logic & API caller
-│   └── README.md       # Panduan menjalankan frontend
-└── README.md           # Panduan penugasan & spesifikasi API
-```
+│ ├── movies.json # Initial movie dataset (20 movies)
+│ └── seed.sql # Initial SQL seed data
+│
+├── routes/ # Routes and endpoints
+│ ├── **init**.py
+│ ├── auth.py
+│ ├── movies.py
+│ ├── watchlist.py
+│ └── watched.py
+│
+└── frontend/
+├── index.html
+├── app.js
+└── README.md
 
----
+## Prerequisites
 
-## 📑 Spesifikasi Kontrak API (API Contract)
+- **Python**
+- **Git** – To clone the repository.
+- **Google Gemini API Key** – For the AI reccomendations.
+- **Postman (optional)** – For testing API endpoints.
 
-Agar sistem dapat terhubung secara lancar dengan frontend companion yang disediakan, pastikan API Anda mematuhi spesifikasi antarmuka (API Contract) berikut:
+## Installation
 
-### 1. Autentikasi
-* `POST /api/auth/register`
-  * **Body:** `{ "username": "string", "email": "string", "password": "string" }`
-  * **Response:** Status `201 Created`
-* `POST /api/auth/login`
-  * **Body:** `{ "email": "string", "password": "string" }`
-  * **Response:** Status `200 OK`, JSON berisi `{ "token": "JWT_STRING", "user": { ... } }`
+To run it locally just
 
-### 2. Movies
-* `GET /api/movies`
-  * **Query Params (Opsional):** `?genre=Sci-Fi&search=Inception`
-  * **Response:** Status `200 OK`, array daftar film dari database.
-* `GET /api/movies/:id`
-  * **Response:** Status `200 OK`, detail lengkap satu film.
+1. Copy the repo.
+   git clone <https://github.com/sdrawkcaBemaN/movie-watchlist-starter>
 
-### 3. Watchlist (Protected - Membutuhkan `Authorization: Bearer <token>`)
-* `GET /api/watchlist`
-  * **Response:** Status `200 OK`, daftar film di watchlist user yang sedang login.
-* `POST /api/watchlist`
-  * **Body:** `{ "movieId": 1 }`
-  * **Response:** Status `201 Created`
-* `DELETE /api/watchlist/:movieId`
-  * **Response:** Status `200 OK` (atau `204 No Content`)
+2. Create and active your venv in the project directory.
+   python -m venv venv
+   venv\Scripts\activate
 
-### 4. Watched & Review (Protected - Membutuhkan `Authorization: Bearer <token>`)
-* `GET /api/watched`
-  * **Response:** Status `200 OK`, riwayat film yang sudah ditonton oleh user beserta ulasan dan ratingnya.
-* `POST /api/watched`
-  * **Body:** `{ "movieId": 1, "rating": 5, "review": "Filmnya luar biasa..." }`
-  * **Response:** Status `201 Created`.
+3. Install dependencies.
+   pip install -r requirements.txt
 
-### 5. AI Recommendation (Gemini API Integration ⭐)
-* `POST /api/movies/recommend`
-  * **Body:** `{ "prompt": "Saya mau film misteri dengan alur lambat dan atmosfer mendalam" }`
-  * **Aturan Khusus:** Film yang direkomendasikan **harus berasal dari 20 film di database awal**.
-  * **Response:** Status `200 OK` dengan JSON terstruktur:
-    ```json
-    {
-      "movie_id": 14,
-      "reasoning": "Memento sangat cocok dengan preferensi misteri Anda karena..."
-    }
-    ```
+## Environment Variables
 
----
+API_KEY = [your Gemini API key]
+JWT_SECRET_KEY = [your secret key]
 
-## 💡 Prinsip Backend yang Dinilai
-1. **Database Modeling:** Relasi yang rapi antar tabel (`users`, `movies`, `watchlists`, `reviews`).
-2. **Access Control & Security:** Password di-hash (bcrypt/argon2), rute privat terlindungi token JWT, user tidak dapat memodifikasi data user lain.
-3. **Data Integrity & Robustness:** Validasi input request, penanganan error yang baik, dan penggunaan status code HTTP yang semantik.
-4. **Structured LLM Prompting:** Kemampuan mengarahkan Gemini untuk memilih dari subset data lokal dan mengembalikan JSON terstruktur.
+## Running the Application
+
+To start the application
+
+1. Run the flask backend.
+   python app.py
+
+Running the app already intializes the database.
+
+2. Open the frontend.
+
+## API Endpoints
+
+- POST `/api/auth/register`
+- POST `/api/auth/login`
+- GET `/api/movies/`
+- GET `/api/movies/<id>`
+- POST `/api/movies/recommend`
+- GET `/api/watchlist/`
+- POST `/api/watchlist/`
+- DELETE `/api/watchlist/<movie_id>`
+- GET `/api/watched/`
+- POST `/api/watched/`
