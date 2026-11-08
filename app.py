@@ -26,10 +26,12 @@ def initialize_routes():
     from routes.auth import auth_bp
     from routes.movie import movie_bp
     from routes.watchlist import watchlist_bp
+    from routes.watched import watched_bp
 
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(movie_bp, url_prefix='/api/movies')
     app.register_blueprint(watchlist_bp, url_prefix='/api/watchlist')
+    app.register_blueprint(watched_bp, url_prefix='/api/watched')
     
 initialize_routes()
 

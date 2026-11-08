@@ -49,7 +49,7 @@ class Movie(db.Model):
     
     watchlists = db.relationship('Watchlist', back_populates='movie', cascade="all, delete-orphan")
     reviews = db.relationship('Review', back_populates='movie', cascade="all, delete-orphan")
-    watched = db.relationship('Watched', back_populates='user', cascade="all, delete-orphan")
+    watched = db.relationship('Watched', back_populates='movie', cascade="all, delete-orphan")
 
     def to_json(self):
         return {
