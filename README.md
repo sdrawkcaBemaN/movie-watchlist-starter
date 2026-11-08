@@ -74,8 +74,8 @@ To run it locally just
 
 ## Environment Variables
 
-API_KEY = [your Gemini API key]
-JWT_SECRET_KEY = [your secret key]
+- API_KEY = [your Gemini API key]
+- JWT_SECRET_KEY = [your secret key]
 
 ## Running the Application
 
