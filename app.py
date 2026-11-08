@@ -24,7 +24,7 @@ with app.app_context():
 
 def initialize_routes():
     from routes.auth import auth_bp
-    from routes.movie import movie_bp
+    from routes.movies import movie_bp
     from routes.watchlist import watchlist_bp
     from routes.watched import watched_bp
 
