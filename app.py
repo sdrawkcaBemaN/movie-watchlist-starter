@@ -18,8 +18,23 @@ jwt = JWTManager(app)
 CORS(app)
 
 with app.app_context():
-    import models 
+    import models
+    from models import Movie
+    import json
+    from pathlib import Path
+
     db.create_all()
+
+    movies_file = Path(__file__).resolve().parent / "data" / "movies.json"
+
+    with open(movies_file, "r", encoding="utf-8") as file:
+        movies_data = json.load(file)
+
+    for movie_data in movies_data:
+        if not db.session.get(Movie, movie_data["id"]):
+            db.session.add(Movie(**movie_data))
+
+    db.session.commit()
 
 def initialize_routes():
     from routes.auth import auth_bp
