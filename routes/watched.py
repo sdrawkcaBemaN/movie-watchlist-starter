@@ -7,7 +7,7 @@ watched_bp = Blueprint("watched", __name__)
 
 
 # GET /api/watched
-@watched_bp.route("/", methods=["GET"])
+@watched_bp.route("/", methods=["GET"], strict_slashes=False)
 @jwt_required()
 def get_watched():
     user_id = int(get_jwt_identity())
@@ -34,7 +34,7 @@ def get_watched():
 
 
 # POST /api/watched
-@watched_bp.route("/", methods=["POST"])
+@watched_bp.route("/", methods=["POST"], strict_slashes=False)
 @jwt_required()
 def add_watched():
     user_id = int(get_jwt_identity())

@@ -6,7 +6,7 @@ from db import db
 watchlist_bp = Blueprint("watchlist", __name__)
 
 # GET /api/watchlist
-@watchlist_bp.route("/", methods=["GET"])
+@watchlist_bp.route("/", methods=["GET"], strict_slashes=False)
 @jwt_required()
 def get_watchlist():
     user_id = int(get_jwt_identity())
@@ -17,12 +17,12 @@ def get_watchlist():
     }, 200
 
 # POST /api/watchlist
-@watchlist_bp.route("/", methods=["POST"])
+@watchlist_bp.route("/", methods=["POST"], strict_slashes=False)
 @jwt_required()
 def add_to_watchlist():
     user_id = int(get_jwt_identity())
     data = request.get_json()
-    movie_id = data.get("movie_id")
+    movie_id = data.get("movieId")
 
     if not movie_id:
         return {"error": "Movie ID is required"}, 400
@@ -52,13 +52,13 @@ def add_to_watchlist():
         "data": new_item.to_json()
     }, 201
 
-# DELETE /api/watchlist/<watchlist_id>
-@watchlist_bp.route("/<int:watchlist_id>", methods=["DELETE"])
+# DELETE /api/watchlist/<movie_id>
+@watchlist_bp.route("/<int:movie_id>", methods=["DELETE"])
 @jwt_required()
-def remove_from_watchlist(watchlist_id):
+def remove_from_watchlist(movie_id):
     user_id = int(get_jwt_identity())
     item = Watchlist.query.filter_by(
-        id=watchlist_id,
+        movie_id=movie_id,
         user_id=user_id
     ).first()
 
